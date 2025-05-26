@@ -35,10 +35,13 @@ class WS_Client(object):
                 # send a private subscription request
                 if "private/subscribe" in request:
                     await websocket.send(request)
-                    while websocket.open:
-                        response = await websocket.recv()
-                        response = json.loads(response)
-                        print(response)
+                    while True:
+                        try:
+                            response = await websocket.recv()
+                            response = json.loads(response)
+                            # print(response)
+                        except websockets.exceptions.ConnectionClosed:
+                            break
 
                 # send a private method request
                 else:
@@ -60,10 +63,13 @@ class WS_Client(object):
     async def public_sub(self, request):
         async with websockets.connect(self.client_url) as websocket:
             await websocket.send(request)
-            while websocket.open:
-                response = await websocket.recv()
-                response = json.loads(response)
-                print(response)
+            while True:
+                try:
+                    response = await websocket.recv()
+                    response = json.loads(response)
+                    # print(response)
+                except websockets.exceptions.ConnectionClosed:
+                    break
 
     # create an asyncio event loop
     def loop(self, api, request):
